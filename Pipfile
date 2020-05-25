@@ -8,6 +8,7 @@ verify_ssl = true
 [packages]
 pandas = "==1.0.3"
 requests = "==2.23.0"
+jupyter = "==1.0.0"
 
 [requires]
 python_version = "3.8"
