@@ -1,3 +1,5 @@
+import os
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
@@ -8,7 +10,9 @@ from datetime import datetime
 # 以下の条件を満たすため、利用ユーザ数が増えない限りDBはsqlite3で良いと思ってる
 #   - テーブル更新はcronでの定期実行のみ
 #   - ユーザ情報等は特に保持しない
-engine = create_engine("sqlite:///sqlite3.db", echo=True)
+db_file_path = f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}/sqlite3.db"
+
+engine = create_engine(f"sqlite:///{db_file_path}", echo=True)
 
 # テーブル用クラス作成するとき継承
 Base = declarative_base()
