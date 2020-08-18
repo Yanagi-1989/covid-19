@@ -63,17 +63,22 @@ class PatientsModel(Base):
         return models
 
     @classmethod
-    def delete_insert(cls, models):
+    def delete_insert(cls, models, prefecture_code):
         """テーブルをDELETE/INSERT
 
         Parameters
         ----------
-        models: list[PatientsModel]"""
+        models: list[PatientsModel]
+            INSERT対象のDBモデルリスト
+        prefecture_code: str
+            都道府県コード"""
         db_session = DBSession(autocommit=True)
         db_session.begin()
 
         try:
-            db_session.query(PatientsModel).delete()
+            db_session.query(PatientsModel) \
+                .filter(PatientsModel.prefecture_code == prefecture_code) \
+                .delete()
             db_session.add_all(models)
         except Exception:
             db_session.rollback()
