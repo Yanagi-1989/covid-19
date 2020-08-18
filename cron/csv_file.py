@@ -15,6 +15,8 @@ class CSVBase:
     date_col_name = "公表_年月日"
     # 感染者数の列名(独自に命名)
     num_col_name = "人数"
+    # CSVのエンコード
+    csv_encoding = "utf-8-sig"
 
     def __init__(self):
         # TODO: CSVの列目チェック
@@ -28,7 +30,7 @@ class CSVBase:
         -------
         pandas.DataFrame"""
         res = requests.get(self.url)
-        csv_data = [row.split(",") for row in res.content.decode("utf-8-sig").split("\r\n")[:-1]]
+        csv_data = [row.split(",") for row in res.content.decode(self.csv_encoding).split("\r\n")[:-1]]
         patients_df = pd.DataFrame(csv_data[1:], columns=csv_data[0])
 
         return patients_df
@@ -69,6 +71,12 @@ class CSVBase:
         dates_df = pd.DataFrame([(_date.strftime("%Y-%m-%d"), 0) for _date in dates],
                                 columns=[self.date_col_name, self.num_col_name])
         return dates_df
+
+
+class CSVHokkaido(CSVBase):
+    prefecture_code = "01"
+    url = "https://www.harp.lg.jp/opendata/dataset/1369/resource/3132/010006_hokkaido_covid19_patients.csv"
+    csv_encoding = "sjis"
 
 
 class CSVTokyo(CSVBase):
