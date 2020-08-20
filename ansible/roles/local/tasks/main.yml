@@ -1,0 +1,12 @@
+
+- name: install python library(pipenv)
+  shell: |
+    cd /home/vagrant/covid-19/cron
+    bash -lc "pipenv install --system"
+
+# TODO: flask app の場所にライブラリ定義を作成したら書き換え
+- name: install python library(pipenv)
+  shell: bash -lc "pip install flask"
+
+- name: DB作成するスクリプトを実行
+  shell: "/usr/local/bin/.pyenv/shims/python /home/vagrant/covid-19/cron/run.py"

@@ -2,3 +2,8 @@
   become: yes
   roles:
     - common
+
+- hosts: local
+  become: yes
+  roles:
+    - local

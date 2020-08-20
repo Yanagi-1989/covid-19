@@ -17,5 +17,8 @@ Vagrant.configure("2") do |config|
   config.vm.provision "ansible" do |ansible|
     ansible.ask_become_pass = false
     ansible.playbook = "ansible/site.yml"
+    ansible.groups = {
+      "local" => ["default"]
+    }
   end
 end
