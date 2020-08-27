@@ -30,6 +30,8 @@
       - liblzma-dev
       - python-openssl
       - git
+      # Nginx
+      - nginx
 
 - name: Create group
   group:
