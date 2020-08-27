@@ -82,3 +82,10 @@
 
 - name: install uWSGI
   shell: bash -lc "pip install uWSGI"
+
+- name: uWSGI用のディレクトリ作成
+  file:
+    path: /var/log/uwsgi
+    state: directory
+    group: "{{ group }}"
+    mode: 0777

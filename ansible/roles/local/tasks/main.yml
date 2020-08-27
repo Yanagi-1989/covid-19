@@ -1,3 +1,8 @@
+- name: vagrantデフォルトユーザを当プロジェクト用グループ"covid19"に追加
+  user:
+    name: "vagrant"
+    groups: "covid19"
+    append: yes
 
 - name: install python library(pipenv)
   shell: |
@@ -10,3 +15,60 @@
 
 - name: DB作成するスクリプトを実行
   shell: "/usr/local/bin/.pyenv/shims/python /home/vagrant/covid-19/cron/run.py"
+
+- name: uwsgi.ini ファイル存在確認
+  shell: ls /home/vagrant/covid-19/flask_app/uwsgi.ini
+  register: uwsgi_ini_exists
+  ignore_errors: yes
+  changed_when: false
+
+- name: create uWSGI init file
+  blockinfile:
+    path: "/home/vagrant/covid-19/flask_app/uwsgi.ini"
+    create: yes
+    mode: 0111
+    block: |
+      [uwsgi]
+      master = true
+      socket = /tmp/uwsgi.sock
+      chmod-socket = 666
+      py-autoreload = 1
+      # app.py内にてapp = Flask(__name__)と定義
+      callable = app
+      module = app
+      wsgi-file = app.py
+      chdir = /home/vagrant/covid-19/flask_app
+      # DBファイルのパス
+      env = DB_PATH=/home/vagrant/covid-19/sqlite3.db
+      # パーミッション変更必須
+      logto = /var/log/uwsgi/uwsgi.log
+      # END ANSIBLE MANAGED BLOCK
+  when: uwsgi_ini_exists is failed
+
+- name: uwsgi.service ファイル存在確認
+  shell: ls /etc/systemd/system/uwsgi.service
+  register: uwsgi_service_exists
+  ignore_errors: yes
+  changed_when: false
+
+- name: create systemctl uWSGI file
+  blockinfile:
+    path: "/etc/systemd/system/uwsgi.service"
+    create: yes
+    mode: 0111
+    block: |
+      [Unit]
+      Description = uWSGI
+      After = syslog.target
+
+      [Service]
+      ExecStart = /usr/local/bin/.pyenv/shims/uwsgi --ini /home/vagrant/covid-19/flask_app/uwsgi.ini
+      Restart=always
+      KillSignal=SIGQUIT
+      Type=notify
+      StandardError=syslog
+      NotifyAccess=all
+
+      [Install]
+      WantedBy=multi-user.target
+  when: uwsgi_service_exists is failed
