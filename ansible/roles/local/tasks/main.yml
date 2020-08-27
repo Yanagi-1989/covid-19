@@ -72,3 +72,25 @@
       [Install]
       WantedBy=multi-user.target
   when: uwsgi_service_exists is failed
+
+- name: nginx conf ファイル存在確認
+  shell: ls /etc/nginx/conf.d/default.conf
+  register: nginx_conf_exists
+  ignore_errors: yes
+  changed_when: false
+
+- name: create nginx conf
+  blockinfile:
+    path: "/etc/nginx/conf.d/default.conf"
+    create: yes
+    mode: 0111
+    block: |
+      server {
+          listen       80 default_server;
+
+          location / {
+              include uwsgi_params;
+              uwsgi_pass unix:///tmp/uwsgi.sock;
+          }
+      }
+  when: nginx_conf_exists is failed

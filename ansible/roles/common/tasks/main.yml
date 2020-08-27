@@ -89,3 +89,14 @@
     state: directory
     group: "{{ group }}"
     mode: 0777
+
+- name: nginxのデフォルト設定ファイル存在確認
+  stat:
+    path: /etc/nginx/sites-enabled/default
+  register: link
+
+- name: デフォルト設定のシンボリックリンクを削除(port:80の重複を避けるため)
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  when: link is success
