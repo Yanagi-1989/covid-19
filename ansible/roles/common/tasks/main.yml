@@ -77,3 +77,6 @@
 
 - name: install pipenv
   shell: bash -lc "pip install pipenv"
+
+- name: install uWSGI
+  shell: bash -lc "pip install uWSGI"
