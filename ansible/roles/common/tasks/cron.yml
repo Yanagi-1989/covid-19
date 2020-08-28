@@ -5,3 +5,14 @@
 
 - name: DB作成するスクリプトを実行
   shell: "{{ pyenv_python_path }} {{ cron_script_path }}"
+
+- name: cronを設定
+  template:
+    src: ./cron.d.sqlite3_csv.j2
+    dest: "/etc/cron.d/sqlite3_csv"
+    mode: 0600  # これでないとINSECURE MODE
+
+- name: service cron restart
+  service:
+    name: cron
+    state: restarted
