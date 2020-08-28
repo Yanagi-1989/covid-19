@@ -2,6 +2,7 @@
   become: yes
   vars:
     user: "vagrant"
+    home_directory : "/home/{{ user }}"
+    project_directory: "/home/{{ user }}/covid-19"
   roles:
     - common
-    - local

@@ -18,3 +18,10 @@ uwsgi_log_file_path: "{{ uwsgi_log_directory }}/uwsgi.log"
 # Nginx
 nginx_default_conf_path : "/etc/nginx/conf.d/flask_app.conf"
 nginx_default_path: "/etc/nginx/sites-enabled/default"
+
+# 'project_directory'はホスト毎に変更される
+db_file_path: "{{ project_directory }}/sqlite3.db"
+cron_app_directory: "{{ project_directory }}/cron"
+cron_script_path: "{{ cron_app_directory }}/run.py"
+flask_app_directory: "{{ project_directory }}/flask_app"
+flask_app_uwsgi_ini_path: "{{ flask_app_directory }}/uwsgi.ini"

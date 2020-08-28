@@ -101,3 +101,100 @@
     path: "{{ nginx_default_path }}"
     state: absent
   when: link is success
+
+- name: ユーザを当プロジェクト用グループ"{{ group }}"に追加
+  user:
+    name: "{{ user }}"
+    groups: "{{ group }}"
+    append: yes
+
+- name: install python library(pipenv)
+  shell: |
+    cd {{ cron_app_directory }}
+    bash -lc "pipenv install --system"
+
+# TODO: flask app の場所にライブラリ定義を作成したら書き換え
+- name: install python library(pipenv)
+  shell: bash -lc "pip install flask"
+
+- name: DB作成するスクリプトを実行
+  shell: "{{ pyenv_python_path }} {{ cron_script_path }}"
+
+- name: uwsgi.ini ファイル存在確認
+  shell: ls {{ flask_app_uwsgi_ini_path }}
+  register: uwsgi_ini_exists
+  ignore_errors: yes
+  changed_when: false
+
+- name: create uWSGI init file
+  blockinfile:
+    path: "{{ flask_app_uwsgi_ini_path }}"
+    create: yes
+    mode: 0111
+    block: |
+      [uwsgi]
+      master = true
+      socket = /tmp/uwsgi.sock
+      chmod-socket = 666
+      py-autoreload = 1
+      # app.py内にてapp = Flask(__name__)と定義
+      callable = app
+      module = app
+      wsgi-file = app.py
+      chdir = {{ flask_app_directory }}
+      # DBファイルのパス
+      env = DB_PATH={{ db_file_path }}
+      # パーミッション変更必須
+      logto = {{ uwsgi_log_file_path }}
+      # END ANSIBLE MANAGED BLOCK
+  when: uwsgi_ini_exists is failed
+
+- name: uwsgi.service ファイル存在確認
+  shell: ls {{ uwsgi_service_path }}
+  register: uwsgi_service_exists
+  ignore_errors: yes
+  changed_when: false
+
+- name: create systemctl uWSGI file
+  blockinfile:
+    path: "{{ uwsgi_service_path }}"
+    create: yes
+    mode: 0111
+    block: |
+      [Unit]
+      Description = uWSGI
+      After = syslog.target
+
+      [Service]
+      ExecStart = {{ uwsgi_path }} --ini {{ flask_app_uwsgi_ini_path }}
+      Restart=always
+      KillSignal=SIGQUIT
+      Type=notify
+      StandardError=syslog
+      NotifyAccess=all
+
+      [Install]
+      WantedBy=multi-user.target
+  when: uwsgi_service_exists is failed
+
+- name: nginx conf ファイル存在確認
+  shell: ls {{ nginx_default_conf_path }}
+  register: nginx_conf_exists
+  ignore_errors: yes
+  changed_when: false
+
+- name: create nginx conf
+  blockinfile:
+    path: "{{ nginx_default_conf_path }}"
+    create: yes
+    mode: 0111
+    block: |
+      server {
+          listen       80 default_server;
+
+          location / {
+              include uwsgi_params;
+              uwsgi_pass unix:///tmp/uwsgi.sock;
+          }
+      }
+  when: nginx_conf_exists is failed
