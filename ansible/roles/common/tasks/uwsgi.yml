@@ -1,0 +1,21 @@
+- name: install uWSGI
+  shell: bash -lc "pip install uWSGI"
+
+- name: uWSGI用のディレクトリ作成
+  file:
+    path: "{{ uwsgi_log_directory }}"
+    state: directory
+    group: "{{ group }}"
+    mode: 0777
+
+- name: create uWSGI init file
+  template:
+    src: ./uwsgi.ini.j2
+    dest: "{{ flask_app_uwsgi_ini_path }}"
+    mode: 0111
+
+- name: create systemctl uWSGI file
+  template:
+    src: ./uwsgi.service.j2
+    dest: "{{ uwsgi_service_path }}"
+    mode: 0111

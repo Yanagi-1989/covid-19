@@ -1,0 +1,7 @@
+- name: install python library(pipenv)
+  shell: |
+    cd {{ cron_app_directory }}
+    bash -lc "pipenv install --system"
+
+- name: DB作成するスクリプトを実行
+  shell: "{{ pyenv_python_path }} {{ cron_script_path }}"

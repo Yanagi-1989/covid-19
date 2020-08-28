@@ -7,96 +7,13 @@
     update_cache: yes
     upgrade: yes
 
-- name: apt install
+- name: 日本語入力を可能にする
   apt:
-    name:
-      # 日本語入力を可能にする
-      - language-pack-ja
-      # == pyenvのインストールに必要 ==
-      - build-essential
-      - libssl-dev
-      - zlib1g-dev
-      - libbz2-dev
-      - libreadline-dev
-      - libsqlite3-dev
-      - wget
-      - curl
-      - llvm
-      - libncurses5-dev
-      - libncursesw5-dev
-      - xz-utils
-      - tk-dev
-      - libffi-dev
-      - liblzma-dev
-      - python-openssl
-      - git
-      # Nginx
-      - nginx
+    name: language-pack-ja
 
 - name: Create group
   group:
     name: "{{ group }}"
-
-- name: pyenvをgit clone
-  git:
-    repo: "git://github.com/yyuu/pyenv.git"
-    dest: "{{ pyenv_path }}"
-    force: true
-
-- name: pyenvのパーミッション変更(pyenv init時に書き込みが行われるため)
-  file:
-    path: "{{ pyenv_path }}"
-    state: directory
-    group: "{{ group }}"
-    recurse: yes
-    mode: 0777
-
-- name: 全てのユーザにpyenvを有効化
-  template:
-    src: ./pyenv.sh.j2
-    dest: "/etc/profile.d/payenv.sh"
-    mode: 0775
-
-- name: Python{{ python_version }}インストール確認(pyenv)
-  shell: bash -lc "pyenv versions | grep {{ python_version }}"
-  register: pyenv_version
-  ignore_errors: yes
-  changed_when: false
-
-- name: pyenv install {{ python_version }}
-  shell: bash -lc "pyenv install {{ python_version }}"
-  when: pyenv_version is failed
-
-- name: pyenv global {{ python_version }}
-  shell: bash -lc "pyenv global {{ python_version }}"
-
-- name: upgrade pip
-  shell: bash -lc "pip install --upgrade pip"
-
-- name: install pipenv
-  shell: bash -lc "pip install pipenv"
-
-- name: install uWSGI
-  shell: bash -lc "pip install uWSGI"
-
-
-- name: uWSGI用のディレクトリ作成
-  file:
-    path: "{{ uwsgi_log_directory }}"
-    state: directory
-    group: "{{ group }}"
-    mode: 0777
-
-- name: nginxのデフォルト設定ファイル存在確認
-  stat:
-    path: "{{ nginx_default_path }}"
-  register: link
-
-- name: デフォルト設定のシンボリックリンクを削除(port:80の重複を避けるため)
-  file:
-    path: "{{ nginx_default_path }}"
-    state: absent
-  when: link is success
 
 - name: ユーザを当プロジェクト用グループ"{{ group }}"に追加
   user:
@@ -104,32 +21,9 @@
     groups: "{{ group }}"
     append: yes
 
-- name: install python library(pipenv)
-  shell: |
-    cd {{ cron_app_directory }}
-    bash -lc "pipenv install --system"
 
-# TODO: flask app の場所にライブラリ定義を作成したら書き換え
-- name: install python library(pipenv)
-  shell: bash -lc "pip install flask"
-
-- name: DB作成するスクリプトを実行
-  shell: "{{ pyenv_python_path }} {{ cron_script_path }}"
-
-- name: create uWSGI init file
-  template:
-    src: ./uwsgi.ini.j2
-    dest: "{{ flask_app_uwsgi_ini_path }}"
-    mode: 0111
-
-- name: create systemctl uWSGI file
-  template:
-    src: ./uwsgi.service.j2
-    dest: "{{ uwsgi_service_path }}"
-    mode: 0111
-
-- name: create nginx conf
-  template:
-    src: ./flask_app.conf.j2
-    dest: "{{ nginx_default_conf_path }}"
-    mode: 0111
+- include: python.yml
+- include: cron.yml
+- include: flask_app.yml
+- include: uwsgi.yml
+- include: nginx.yml

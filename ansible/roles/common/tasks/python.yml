@@ -1,0 +1,59 @@
+- name: pyenvのインストールに必要なものを apt install
+  apt:
+    name:
+      - build-essential
+      - libssl-dev
+      - zlib1g-dev
+      - libbz2-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - wget
+      - curl
+      - llvm
+      - libncurses5-dev
+      - libncursesw5-dev
+      - xz-utils
+      - tk-dev
+      - libffi-dev
+      - liblzma-dev
+      - python-openssl
+      - git
+
+- name: pyenvをgit clone
+  git:
+    repo: "git://github.com/yyuu/pyenv.git"
+    dest: "{{ pyenv_path }}"
+    force: true
+
+- name: pyenvのパーミッション変更(pyenv init時に書き込みが行われるため)
+  file:
+    path: "{{ pyenv_path }}"
+    state: directory
+    group: "{{ group }}"
+    recurse: yes
+    mode: 0777
+
+- name: 全てのユーザにpyenvを有効化
+  template:
+    src: ./pyenv.sh.j2
+    dest: "/etc/profile.d/payenv.sh"
+    mode: 0775
+
+- name: Python{{ python_version }}インストール確認(pyenv)
+  shell: bash -lc "pyenv versions | grep {{ python_version }}"
+  register: pyenv_version
+  ignore_errors: yes
+  changed_when: false
+
+- name: pyenv install {{ python_version }}
+  shell: bash -lc "pyenv install {{ python_version }}"
+  when: pyenv_version is failed
+
+- name: pyenv global {{ python_version }}
+  shell: bash -lc "pyenv global {{ python_version }}"
+
+- name: upgrade pip
+  shell: bash -lc "pip install --upgrade pip"
+
+- name: install pipenv
+  shell: bash -lc "pip install pipenv"
