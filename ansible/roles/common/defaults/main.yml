@@ -1,0 +1,20 @@
+#######################################
+# 全てのホスト、タスクにて使用される変数
+#######################################
+
+# Linuxのグループ名
+group: covid19
+# 使用するPythonバージョン
+python_version: 3.8.5
+# Pyenvのトップディレクトリ
+pyenv_path: /usr/local/bin/.pyenv
+# PyenvのPythonパス
+pyenv_python_path: "/usr/local/bin/.pyenv/shims/python"
+# uWSGI
+uwsgi_path: "/usr/local/bin/.pyenv/shims/uwsgi"
+uwsgi_service_path: "/etc/systemd/system/uwsgi.service"
+uwsgi_log_directory: "/var/log/uwsgi"
+uwsgi_log_file_path: "{{ uwsgi_log_directory }}/uwsgi.log"
+# Nginx
+nginx_default_conf_path : "/etc/nginx/conf.d/flask_app.conf"
+nginx_default_path: "/etc/nginx/sites-enabled/default"
