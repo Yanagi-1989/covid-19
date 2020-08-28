@@ -52,14 +52,10 @@
     mode: 0777
 
 - name: 全てのユーザにpyenvを有効化
-  blockinfile:
-    path: "/etc/profile.d/pyenv.sh"
-    create: yes
+  template:
+    src: ./pyenv.sh.j2
+    dest: "/etc/profile.d/payenv.sh"
     mode: 0775
-    block: |
-      export PYENV_ROOT="{{ pyenv_path }}"
-      export PATH="$PYENV_ROOT/bin:$PATH"
-      eval "$(pyenv init -)"
 
 - name: Python{{ python_version }}インストール確認(pyenv)
   shell: bash -lc "pyenv versions | grep {{ python_version }}"
@@ -120,81 +116,20 @@
 - name: DB作成するスクリプトを実行
   shell: "{{ pyenv_python_path }} {{ cron_script_path }}"
 
-- name: uwsgi.ini ファイル存在確認
-  shell: ls {{ flask_app_uwsgi_ini_path }}
-  register: uwsgi_ini_exists
-  ignore_errors: yes
-  changed_when: false
-
 - name: create uWSGI init file
-  blockinfile:
-    path: "{{ flask_app_uwsgi_ini_path }}"
-    create: yes
+  template:
+    src: ./uwsgi.ini.j2
+    dest: "{{ flask_app_uwsgi_ini_path }}"
     mode: 0111
-    block: |
-      [uwsgi]
-      master = true
-      socket = /tmp/uwsgi.sock
-      chmod-socket = 666
-      py-autoreload = 1
-      # app.py内にてapp = Flask(__name__)と定義
-      callable = app
-      module = app
-      wsgi-file = app.py
-      chdir = {{ flask_app_directory }}
-      # DBファイルのパス
-      env = DB_PATH={{ db_file_path }}
-      # パーミッション変更必須
-      logto = {{ uwsgi_log_file_path }}
-      # END ANSIBLE MANAGED BLOCK
-  when: uwsgi_ini_exists is failed
-
-- name: uwsgi.service ファイル存在確認
-  shell: ls {{ uwsgi_service_path }}
-  register: uwsgi_service_exists
-  ignore_errors: yes
-  changed_when: false
 
 - name: create systemctl uWSGI file
-  blockinfile:
-    path: "{{ uwsgi_service_path }}"
-    create: yes
+  template:
+    src: ./uwsgi.service.j2
+    dest: "{{ uwsgi_service_path }}"
     mode: 0111
-    block: |
-      [Unit]
-      Description = uWSGI
-      After = syslog.target
-
-      [Service]
-      ExecStart = {{ uwsgi_path }} --ini {{ flask_app_uwsgi_ini_path }}
-      Restart=always
-      KillSignal=SIGQUIT
-      Type=notify
-      StandardError=syslog
-      NotifyAccess=all
-
-      [Install]
-      WantedBy=multi-user.target
-  when: uwsgi_service_exists is failed
-
-- name: nginx conf ファイル存在確認
-  shell: ls {{ nginx_default_conf_path }}
-  register: nginx_conf_exists
-  ignore_errors: yes
-  changed_when: false
 
 - name: create nginx conf
-  blockinfile:
-    path: "{{ nginx_default_conf_path }}"
-    create: yes
+  template:
+    src: ./flask_app.conf.j2
+    dest: "{{ nginx_default_conf_path }}"
     mode: 0111
-    block: |
-      server {
-          listen       80 default_server;
-
-          location / {
-              include uwsgi_params;
-              uwsgi_pass unix:///tmp/uwsgi.sock;
-          }
-      }
-  when: nginx_conf_exists is failed
