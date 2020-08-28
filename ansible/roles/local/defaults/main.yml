@@ -1,0 +1,8 @@
+
+home_directory : "/home/{{ user }}"
+project_directory: "/home/{{ user }}/covid-19"
+db_file_path: "{{ project_directory }}/sqlite3.db"
+cron_app_directory: "{{ project_directory }}/cron"
+cron_script_path: "{{ cron_app_directory }}/run.py"
+flask_app_directory: "{{ project_directory }}/flask_app"
+flask_app_uwsgi_ini_path: "{{ flask_app_directory }}/uwsgi.ini"

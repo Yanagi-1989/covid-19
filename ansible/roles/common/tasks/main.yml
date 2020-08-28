@@ -83,20 +83,21 @@
 - name: install uWSGI
   shell: bash -lc "pip install uWSGI"
 
+
 - name: uWSGI用のディレクトリ作成
   file:
-    path: /var/log/uwsgi
+    path: "{{ uwsgi_log_directory }}"
     state: directory
     group: "{{ group }}"
     mode: 0777
 
 - name: nginxのデフォルト設定ファイル存在確認
   stat:
-    path: /etc/nginx/sites-enabled/default
+    path: "{{ nginx_default_path }}"
   register: link
 
 - name: デフォルト設定のシンボリックリンクを削除(port:80の重複を避けるため)
   file:
-    path: /etc/nginx/sites-enabled/default
+    path: "{{ nginx_default_path }}"
     state: absent
   when: link is success

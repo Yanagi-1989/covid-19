@@ -1,5 +1,0 @@
-
-group: covid19
-# Pyenvのトップディレクトリ
-pyenv_path: /usr/local/bin/.pyenv
-python_version: 3.8.5

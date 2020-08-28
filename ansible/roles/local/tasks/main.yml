@@ -1,12 +1,13 @@
-- name: vagrantデフォルトユーザを当プロジェクト用グループ"covid19"に追加
+
+- name: vagrantデフォルトユーザを当プロジェクト用グループ"{{ group }}"に追加
   user:
-    name: "vagrant"
-    groups: "covid19"
+    name: "{{ user }}"
+    groups: "{{ group }}"
     append: yes
 
 - name: install python library(pipenv)
   shell: |
-    cd /home/vagrant/covid-19/cron
+    cd {{ cron_app_directory }}
     bash -lc "pipenv install --system"
 
 # TODO: flask app の場所にライブラリ定義を作成したら書き換え
@@ -14,17 +15,17 @@
   shell: bash -lc "pip install flask"
 
 - name: DB作成するスクリプトを実行
-  shell: "/usr/local/bin/.pyenv/shims/python /home/vagrant/covid-19/cron/run.py"
+  shell: "{{ pyenv_python_path }} {{ cron_script_path }}"
 
 - name: uwsgi.ini ファイル存在確認
-  shell: ls /home/vagrant/covid-19/flask_app/uwsgi.ini
+  shell: ls {{ flask_app_uwsgi_ini_path }}
   register: uwsgi_ini_exists
   ignore_errors: yes
   changed_when: false
 
 - name: create uWSGI init file
   blockinfile:
-    path: "/home/vagrant/covid-19/flask_app/uwsgi.ini"
+    path: "{{ flask_app_uwsgi_ini_path }}"
     create: yes
     mode: 0111
     block: |
@@ -37,23 +38,24 @@
       callable = app
       module = app
       wsgi-file = app.py
-      chdir = /home/vagrant/covid-19/flask_app
+      chdir = {{ flask_app_directory }}
       # DBファイルのパス
-      env = DB_PATH=/home/vagrant/covid-19/sqlite3.db
+      env = DB_PATH={{ db_file_path }}
       # パーミッション変更必須
-      logto = /var/log/uwsgi/uwsgi.log
+      logto = {{ uwsgi_log_file_path }}
       # END ANSIBLE MANAGED BLOCK
   when: uwsgi_ini_exists is failed
 
+
 - name: uwsgi.service ファイル存在確認
-  shell: ls /etc/systemd/system/uwsgi.service
+  shell: ls {{ uwsgi_service_path }}
   register: uwsgi_service_exists
   ignore_errors: yes
   changed_when: false
 
 - name: create systemctl uWSGI file
   blockinfile:
-    path: "/etc/systemd/system/uwsgi.service"
+    path: "{{ uwsgi_service_path }}"
     create: yes
     mode: 0111
     block: |
@@ -62,7 +64,7 @@
       After = syslog.target
 
       [Service]
-      ExecStart = /usr/local/bin/.pyenv/shims/uwsgi --ini /home/vagrant/covid-19/flask_app/uwsgi.ini
+      ExecStart = {{ uwsgi_path }} --ini {{ flask_app_uwsgi_ini_path }}
       Restart=always
       KillSignal=SIGQUIT
       Type=notify
@@ -73,15 +75,16 @@
       WantedBy=multi-user.target
   when: uwsgi_service_exists is failed
 
+
 - name: nginx conf ファイル存在確認
-  shell: ls /etc/nginx/conf.d/default.conf
+  shell: ls {{ nginx_default_conf_path }}
   register: nginx_conf_exists
   ignore_errors: yes
   changed_when: false
 
 - name: create nginx conf
   blockinfile:
-    path: "/etc/nginx/conf.d/default.conf"
+    path: "{{ nginx_default_conf_path }}"
     create: yes
     mode: 0111
     block: |
