@@ -19,3 +19,8 @@
     src: ./uwsgi.service.j2
     dest: "{{ uwsgi_service_path }}"
     mode: 0111
+
+- name: systemctl restart uwsgi
+  service:
+    name: uwsgi
+    state: restarted

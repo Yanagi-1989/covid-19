@@ -18,3 +18,8 @@
     src: ./flask_app.conf.j2
     dest: "{{ nginx_default_conf_path }}"
     mode: 0111
+
+- name: systemctl restart nginx
+  service:
+    name: nginx
+    state: restarted
