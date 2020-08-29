@@ -79,6 +79,58 @@ class CSVHokkaido(CSVBase):
     csv_encoding = "sjis"
 
 
+# TODO: 一応動作するが、URL等がこれからどう動くかわからないため、これを使用する場合は単純なcron使用をやめ、都道府県バッチ等に切り替える必要がある.
+# class CSVAomori(CSVBase):
+#     prefecture_code = "02"
+#     # ファイルURLが不定
+#     url = ""
+#     # ファイルURLのテンプレート date_strに日付文字列が入る
+#     url_base = "https://opendata.pref.aomori.lg.jp/dataset/1531/resource/11827/02_{date_str}_%E9%99%BD%E6%80%A7%E6%82%A3%E8%80%85%E9%96%A2%E4%BF%82.csv" # NOQA
+#     csv_encoding = "sjis"
+#
+#     def __init__(self):
+#         self._set_url()
+#         super().__init__()
+#
+#     def _set_url(self):
+#         """直近のCSVファイルURLをセットする.
+#
+#         青森県のCSVファイルURLは固定ではなく以下のようになっている模様.
+#         https://{domain}/dataset/1531/resource/11827/02_YYYYMMDD
+#
+#         YYYYMMDDの部分がどのタイミングで更新されるかわからないため、
+#         直近100日間で総当りし、存在する中で一番新しい日付のCSVを使用する."""
+#         from datetime import datetime, timedelta
+#
+#         num = 0
+#         today = datetime.now()
+#         while num < 100:
+#             date_ = today - timedelta(days=num)
+#             date_str = date_.strftime("%Y%m%d")
+#             url = self.url_base.format(date_str=date_str)
+#             res = requests.get(url)
+#
+#             # ファイルが存在した場合はそのURLを使用する
+#             if res.status_code == 200:
+#                 self.url = url
+#                 break
+#             num += 1
+#
+#     def format_patients_df(self):
+#         """日付の文字列がYYYY-MM-DDの形式では無いため修正する必要がある."""
+#
+#         temp_df = self.patients_df[self.date_col_name]
+#
+#         def format_date(date_):
+#             """日付文字列フォーマットを修正(YY日MM月DD日→YY-MM-DD)"""
+#             return datetime.strptime(date_, "%Y年%m月%d日").strftime("%Y-%m-%d")
+#
+#         formatted_dates = [format_date(date_) for date_ in temp_df]
+#
+#         self.patients_df[self.date_col_name] = formatted_dates
+#         return super().format_patients_df()
+
+
 class CSVTokyo(CSVBase):
     prefecture_code = "13"
     url = "https://stopcovid19.metro.tokyo.lg.jp/data/130001_tokyo_covid19_patients.csv"
