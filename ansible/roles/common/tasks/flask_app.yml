@@ -1,0 +1,3 @@
+# TODO: flask app の場所にライブラリ定義を作成したら書き換え
+- name: Flask起動に必要なPythonライブラリをインストール(pipenv)
+  shell: bash -lc "pip install flask"

@@ -1,0 +1,7 @@
+.DS_Store
+.idea/
+.vagrant/
+__pycache__
+*.log
+# 感染者情報が格納されたdbファイル
+sqlite3.db

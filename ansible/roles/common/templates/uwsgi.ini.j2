@@ -1,0 +1,14 @@
+[uwsgi]
+master = true
+socket = /tmp/uwsgi.sock
+chmod-socket = 666
+py-autoreload = 1
+# app.py内にてapp = Flask(__name__)と定義
+callable = app
+module = app
+wsgi-file = app.py
+chdir = {{ flask_app_directory }}
+# DBファイルのパス
+env = DB_PATH={{ db_file_path }}
+# ログ出力先
+logto = {{ uwsgi_log_file_path }}
