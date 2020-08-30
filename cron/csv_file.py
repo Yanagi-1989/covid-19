@@ -162,3 +162,25 @@ class CSVGifu(CSVBase):
     prefecture_code = "21"
     url = "https://data.gifu-opendata.pref.gifu.lg.jp/dataset/4661bf9d-6f75-43fb-9d59-f02eb84bb6e3/resource/9c35ee55-a140-4cd8-a266-a74edf60aa80/download/210005gifucovid19patients.csv" # NOQA
     csv_encoding = "sjis"
+
+
+class CSVShizuoka(CSVBase):
+    prefecture_code = "22"
+    url = "https://opendata.pref.shizuoka.jp/dataset/8167/resource/46279/220001_shizuoka_covid19_patients.csv"
+    csv_encoding = "sjis"
+    # 公表された年月日のフォーマット
+    date_col_fmt = "%Y/%m/%d"
+
+    def format_date(self):
+        """日付文字列を修正"""
+        dates = self.patients_df[self.date_col_name]
+
+        def func(date_):
+            return datetime.strptime(date_, self.date_col_fmt).strftime("%Y-%m-%d")
+
+        formatted_dates = [func(date_) for date_ in dates]
+        return formatted_dates
+
+    def format_patients_df(self):
+        self.patients_df[self.date_col_name] = self.format_date()
+        return super().format_patients_df()
