@@ -1,5 +1,6 @@
 import pandas as pd
 import requests
+from datetime import datetime, timedelta
 
 
 class CSVBase:
@@ -134,3 +135,24 @@ class CSVHokkaido(CSVBase):
 class CSVTokyo(CSVBase):
     prefecture_code = "13"
     url = "https://stopcovid19.metro.tokyo.lg.jp/data/130001_tokyo_covid19_patients.csv"
+
+
+class CSVFukui(CSVBase):
+    prefecture_code = "18"
+    url = "https://www.pref.fukui.lg.jp/doc/toukei-jouhou/covid-19_d/fil/covid19_patients.csv"
+    # 公表された年月日のフォーマット
+    date_col_fmt = "%Y/%m/%d"
+
+    def format_date(self):
+        """日付文字列を修正"""
+        dates = self.patients_df[self.date_col_name]
+
+        def func(date_):
+            return datetime.strptime(date_, self.date_col_fmt).strftime("%Y-%m-%d")
+
+        formatted_dates = [func(date_) for date_ in dates]
+        return formatted_dates
+
+    def format_patients_df(self):
+        self.patients_df[self.date_col_name] = self.format_date()
+        return super().format_patients_df()
