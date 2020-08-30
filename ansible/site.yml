@@ -6,3 +6,14 @@
     project_directory: "/home/{{ user }}/covid-19"
   roles:
     - common
+
+- hosts: vps
+  become: yes
+  vars:
+    user: "ubuntu"
+    www_directory: "/var/www"
+    project_directory: "/var/www/covid-19"
+    load_balancer_ip: "157.7.94.32"
+  roles:
+    - vps
+    - common
