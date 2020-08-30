@@ -13,7 +13,8 @@
    ansible -m ping -u root -i hosts vps
    ansible-playbook -u root -i hosts site.yml
    ```
+1. WEBブラウザにて新規に作成したサーバにのIPにアクセスし、画面が表示されることを確認
+1. ConoHaにて、新しいサーバの接続許可ポートをWEBのみに設定
 1. ConoHaにて、ネットワーク > ロードバランサー > バランシング元ポート80 > バランシング先IPアドレスに、  
    新規作成したサーバを追加し、以前のIPを削除
 1. ConoHaにて、古いサーバを削除
-1. ConoHaにて、新しいサーバの接続許可ポートをWEBのみに設定
