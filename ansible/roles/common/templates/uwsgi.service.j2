@@ -1,0 +1,14 @@
+[Unit]
+Description = uWSGI
+After = syslog.target
+
+[Service]
+ExecStart = {{ uwsgi_path }} --ini {{ flask_app_uwsgi_ini_path }}
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
