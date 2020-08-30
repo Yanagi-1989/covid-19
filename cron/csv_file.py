@@ -141,7 +141,9 @@ class CSVTokyo(CSVBase):
 
 class CSVFukui(CSVBase):
     prefecture_code = "18"
-    url = "https://www.pref.fukui.lg.jp/doc/toukei-jouhou/covid-19_d/fil/covid19_patients.csv"
+    # 公式のファイルが404になっていたため、関連ファイルに変更
+    # https://www.pref.fukui.lg.jp/doc/toukei-jouhou/covid-19.html
+    url = "https://www.pref.fukui.lg.jp/doc/toukei-jouhou/covid-19_d/fil/covid19_patients_.csv"
     # 公表された年月日のフォーマット
     date_col_fmt = "%Y/%m/%d"
 
