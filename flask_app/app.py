@@ -16,7 +16,7 @@ def api_calendar(prefecture_code):
     ----------
     prefecture_code: 都道府県コード"""
 
-    if prefecture_code not in ("13", ):
+    if prefecture_code not in ("01", "13", "18", "21", "22", "35", "40"):
         return jsonify([])
 
     records = PatientsModel.fetch_num(prefecture_code)
@@ -42,9 +42,12 @@ def api_prefectures():
     """地域選択用セレクトボックスにて使用する地域情報を返却するAPI"""
 
     return jsonify([
-        {"prefecture_name": "東京", "prefecture_code": 13},
-        # 東京以外はまだ未実装
-        # {"prefecture_name": "神奈川", "prefecture_code": 12}
+        {"prefecture_name": "東京", "prefecture_code": "13"},
+        {"prefecture_name": "北海道", "prefecture_code": "01"},
+        {"prefecture_name": "福井", "prefecture_code": "18"},
+        {"prefecture_name": "岐阜", "prefecture_code": "21"},
+        {"prefecture_name": "山口", "prefecture_code": "35"},
+        {"prefecture_name": "福岡", "prefecture_code": "40"},
     ])
 
 
