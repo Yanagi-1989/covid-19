@@ -18,6 +18,8 @@ class CSVBase:
     num_col_name = "人数"
     # CSVのエンコード
     csv_encoding = "utf-8-sig"
+    # CSVの改行コード
+    csv_newline = "\r\n"
 
     def __init__(self):
         # TODO: CSVの列目チェック
@@ -31,7 +33,7 @@ class CSVBase:
         -------
         pandas.DataFrame"""
         res = requests.get(self.url)
-        csv_data = [row.split(",") for row in res.content.decode(self.csv_encoding).split("\r\n")[:-1]]
+        csv_data = [row.split(",") for row in res.content.decode(self.csv_encoding).split(self.csv_newline)[:-1]]
         patients_df = pd.DataFrame(csv_data[1:], columns=csv_data[0])
 
         return patients_df
@@ -207,3 +209,32 @@ class CSVYamaguchi(CSVBase):
     def format_patients_df(self):
         self.patients_df[self.date_col_name] = self.format_date()
         return super().format_patients_df()
+
+
+class CSVFukuoka(CSVBase):
+    prefecture_code = "40"
+    url = "https://ckan.open-governmentdata.org/dataset/8a9688c2-7b9f-4347-ad6e-de3b339ef740/resource/c27769a2-8634-47aa-9714-7e21c4038dd4/download/400009_pref_fukuoka_covid19_patients.csv" # NOQA
+    csv_newline = "\n"
+    # 公表された年月日のフォーマット
+    date_col_fmt = "%Y/%m/%d"
+
+    def format_date(self):
+        """日付文字列を修正"""
+        dates = self.patients_df[self.date_col_name]
+
+        def func(date_):
+            return datetime.strptime(date_, self.date_col_fmt).strftime("%Y-%m-%d")
+
+        formatted_dates = [func(date_) for date_ in dates]
+        return formatted_dates
+
+    def format_patients_df(self):
+        self.delete_empty_row()
+
+        self.patients_df[self.date_col_name] = self.format_date()
+        return super().format_patients_df()
+
+    def delete_empty_row(self):
+        """空行を削除"""
+        # No.列以外全て空の行がたまに存在するのでそれを削除
+        self.patients_df = self.patients_df[self.patients_df[self.date_col_name] != ""]
