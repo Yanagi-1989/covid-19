@@ -1,0 +1,26 @@
+# conoha vpsではたまapt upgradeができないことがある。EC2では起こらないぽい
+- name: 「/usr/bin/aptitude safe-upgrade' failed」を発生させないようにする
+  shell: rm /var/lib/dpkg/lock-frontend
+
+- name: ユーザ追加
+  user:
+    name: "{{ user }}"
+    shell: /bin/bash
+    append: yes
+
+- name: create /var/www directory
+  file:
+    path: "{{ www_directory }}"
+    state: directory
+    mode: 0755
+
+- name: git clone
+  git:
+    repo: "https://github.com/Yanagi-1989/covid-19.git"
+    dest: "{{ project_directory }}"
+    version: "develop"
+  become: false
+
+# [参照]　https://support.conoha.jp/v/loadbalancer/
+- name: ロードバランサ用に設定を変更(VPSからクライアントへ直接パケットを転送)
+  shell: iptables -t nat -A PREROUTING -d {{ load_balancer_ip }} -j REDIRECT
