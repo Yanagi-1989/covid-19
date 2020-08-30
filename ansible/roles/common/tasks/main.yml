@@ -1,0 +1,29 @@
+- name: set timezone to Asia/Tokyo
+  timezone:
+    name: Asia/Tokyo
+
+- name: apt update upgrade
+  apt:
+    update_cache: yes
+    upgrade: yes
+
+- name: 日本語入力を可能にする
+  apt:
+    name: language-pack-ja
+
+- name: Create group
+  group:
+    name: "{{ group }}"
+
+- name: ユーザを当プロジェクト用グループ"{{ group }}"に追加
+  user:
+    name: "{{ user }}"
+    groups: "{{ group }}"
+    append: yes
+
+
+- include: python.yml
+- include: cron.yml
+- include: flask_app.yml
+- include: uwsgi.yml
+- include: nginx.yml
