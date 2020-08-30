@@ -9,8 +9,10 @@ const calendarApp = new Vue({
         options: []
     },
     mounted: function () {
-        this.setPrefectures();
+        // デフォルト(東京)のカレンダーを表示
         this.setCalendar();
+        // 選択肢に東京以外の都道府県を表示
+        this.setPrefectures();
     },
     methods: {
         setCalendar: function () {
@@ -25,6 +27,7 @@ const calendarApp = new Vue({
                     this.options = response.data;
                 }).catch(error => {});
         },
+        // セレクトボックスの地域を変更した際に発火
         changePrefecture: function (event) {
             this.PrefectureCode = event.target.value;
             this.setCalendar();
