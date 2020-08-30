@@ -1,0 +1,7 @@
+.idea/
+.vagrant/
+__pycache__
+flask_app/uwsgi.ini
+sqlite3.db
+*.log
+
