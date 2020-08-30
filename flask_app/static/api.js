@@ -4,7 +4,7 @@ const calendarApp = new Vue({
     delimiters: ["[[", "]]"],
     data: {
         // デフォルトは東京
-        PrefectureCode: 13,
+        PrefectureCode: "13",
         items: [],
         options: []
     },
