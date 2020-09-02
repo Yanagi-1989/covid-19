@@ -6,6 +6,14 @@
 - name: DB作成するスクリプトを実行
   shell: "{{ pyenv_python_path }} {{ cron_script_path }}"
 
+- name: DBファイルが存在するディレクトリのパーミッション変更(sqliteはディレクトリ毎パーミッションを読み込めないと動かない)
+  file:
+    path: "{{ project_directory }}"
+    state: directory
+    group: "{{ group }}"
+    mode: 0775
+    recurse: true
+
 - name: cronを設定
   template:
     src: ./cron.d.sqlite3_csv.j2
