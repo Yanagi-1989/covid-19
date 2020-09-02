@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, jsonify, render_template
 
 from db import PatientsModel
@@ -53,7 +55,7 @@ def api_prefectures():
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", domain=os.environ['DOMAIN'])
 
 
 if __name__ == "__main__":
