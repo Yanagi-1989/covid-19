@@ -1,11 +1,11 @@
 if __name__ == '__main__':
-    from csv_file import CSVBase
+    from csv_file import NHKPrefecturesCSV
     from db import init_db, PatientsModel
 
     init_db()
-
-    for cls in CSVBase.__subclasses__():
-        df = cls().format_patients_df()
-
-        models = PatientsModel.gen_models(df, cls.prefecture_code, cls.num_col_name)
-        PatientsModel.delete_insert(models, cls.prefecture_code)
+    # NHKが配布しているCSVからDataFrameを生成
+    df = NHKPrefecturesCSV.gen_df()
+    # DataFrameをDBテーブルモデルに変換
+    models = PatientsModel.gen_models(df)
+    # DBに情報をDELETE/INSERT
+    PatientsModel.delete_insert(models)
