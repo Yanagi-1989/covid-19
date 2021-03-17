@@ -10,5 +10,7 @@ wsgi-file = app.py
 chdir = {{ flask_app_directory }}
 # DBファイルのパス
 env = DB_PATH={{ db_file_path }}
+# ウェブアプリを公開するIPアドレスもしくはドメイン(Twitterカードにて使用する"og:image"は絶対パスのみ使用できため)
+env = DOMAIN={{ flask_app_domain }}
 # ログ出力先
 logto = {{ uwsgi_log_file_path }}
