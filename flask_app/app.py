@@ -18,7 +18,8 @@ def api_calendar(prefecture_code):
     ----------
     prefecture_code: 都道府県コード"""
 
-    if prefecture_code not in [f"{idx:02d}" for idx in range(1, 48)]:
+    # 全国 + 47都道府県 以外のコードが要求された場合は空を返却
+    if prefecture_code not in [f"{idx:02d}" for idx in range(0, 48)]:
         return jsonify([])
 
     records = PatientsModel.fetch_num(prefecture_code)
@@ -44,7 +45,9 @@ def api_prefectures():
     """地域選択用セレクトボックスにて使用する地域情報を返却するAPI"""
 
     return jsonify([
-        {"prefecture_name": "東京都", "prefecture_code": "13"},
+        # 日本全国を指す都道府県コードを便宜上'00'としている
+        {"prefecture_name": "全国", "prefecture_code": "00"},
+        # 以下、47都道府県
         {"prefecture_name": "北海道", "prefecture_code": "01"},
         {"prefecture_name": "青森県", "prefecture_code": "02"},
         {"prefecture_name": "岩手県", "prefecture_code": "03"},
@@ -57,6 +60,7 @@ def api_prefectures():
         {"prefecture_name": "群馬県", "prefecture_code": "10"},
         {"prefecture_name": "埼玉県", "prefecture_code": "11"},
         {"prefecture_name": "千葉県", "prefecture_code": "12"},
+        {"prefecture_name": "東京都", "prefecture_code": "13"},
         {"prefecture_name": "神奈川県", "prefecture_code": "14"},
         {"prefecture_name": "新潟県", "prefecture_code": "15"},
         {"prefecture_name": "富山県", "prefecture_code": "16"},

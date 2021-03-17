@@ -55,7 +55,7 @@ class PatientsModel(Base):
         for idx in range(len(df)):
             # 情報を生成
             publication_date = datetime.strptime(df.iloc[idx][NHKPrefecturesCSV.CSV_DATE_COL_NAME], "%Y/%m/%d")
-            num = df.iloc[idx][NHKPrefecturesCSV.CSV_NUM_NAME]
+            num = int(df.iloc[idx][NHKPrefecturesCSV.CSV_NUM_NAME])
             prefecture_code = df.iloc[idx][NHKPrefecturesCSV.CSV_PREFECTURE_CODE_NAME]
             # 1レコード分の情報生成
             table = PatientsModel()

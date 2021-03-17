@@ -3,8 +3,8 @@ const calendarApp = new Vue({
     // jinja2のデリミタ {{}} と競合するため、デリミタを変更
     delimiters: ["[[", "]]"],
     data: {
-        // デフォルトは東京
-        PrefectureCode: "13",
+        // デフォルトは全国
+        PrefectureCode: "00",
         items: [],
         options: []
     },
