@@ -49,8 +49,15 @@
    ```
 
 ## deploy
-1. ConoHaにてサーバを追加
-1. `~/.ssh/config`の`conoha_covid19`の`HostName`を編集
+1. `~/.ssh/config`の、このプロジェクト用VPSの`Host`、  
+   `conoha_covid19`の`HostName`を作成もしくは編集
+   ```
+   # 例
+   Host conoha_covid19
+       HostName		[Terraformにて作成したVPSのグローバルIP]
+       User			root
+       IdentityFile	~/.ssh/XXXXXX.pem
+   ```
 1. 当プロジェクトのトップディレクトリに移動
 1. 以下のコマンドを実行
    ```bash
