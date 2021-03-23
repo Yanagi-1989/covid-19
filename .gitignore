@@ -6,3 +6,10 @@ __pycache__
 # 感染者情報が格納されたdbファイル
 sqlite3.db
 uwsgi.ini
+
+# Terraform実行時に生成されるファイル
+terraform/.terraform
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/tfplan
