@@ -2,11 +2,10 @@ import pandas as pd
 import requests
 
 
-class NHKPrefecturesCSV:
+class CSVBase:
+    """WEB上にて公開されているCSVファイル共通"""
     # ファイルが存在するURL
-    # 都道府県ごとの感染者数（累計・NHKまとめ）
-    # https://www3.nhk.or.jp/news/special/coronavirus/data/
-    URL = "https://www3.nhk.or.jp/n-data/opendata/coronavirus/nhk_news_covid19_prefectures_daily_data.csv"
+    URL = ""
 
     # ファイルのエンコーディング等の情報
     FILE_ENCODING = "utf-8-sig"
@@ -14,20 +13,11 @@ class NHKPrefecturesCSV:
     # CSV/TSVファイルの区切り文字
     FILE_SPLIT = ","
 
-    # CSVファイルの各列の情報
-    CSV_DATE_COL_NAME = "日付"
-    CSV_PREFECTURE_CODE_NAME = "都道府県コード"
-    CSV_NUM_NAME = "各地の感染者数_1日ごとの発表数"
-
     # 列とそのデータ型
-    CSV_COLUMN_D_TYPES = {
-        CSV_DATE_COL_NAME: str,
-        CSV_PREFECTURE_CODE_NAME: str,
-        CSV_NUM_NAME: int
-    }
+    CSV_COLUMN_D_TYPES = {}
 
-    # 日本全国を指す都道府県コード(あくまで便宜上)
-    NATIONWIDE_PREFECTURE_CODE = "00"
+    # 公開されているファイルの取得に失敗した際のエラーメッセージ
+    ERROR_MESSAGE = f"CSVファイル({URL})の取得に失敗しました"
 
     @classmethod
     def _fetch(cls):
@@ -38,7 +28,7 @@ class NHKPrefecturesCSV:
         str"""
         res = requests.get(cls.URL)
         if res.status_code != 200:
-            raise Exception("NHKが配布しているCSVファイル取得失敗")
+            raise Exception(cls.ERROR_MESSAGE)
 
         return res.content.decode(cls.FILE_ENCODING)
 
@@ -63,29 +53,6 @@ class NHKPrefecturesCSV:
         return ret
 
     @classmethod
-    def _add_nationwide(cls, prefecture_df):
-        """都道府県コード'00'の、全国の感染者数がわかるレコードを追加する.
-
-        Parameters
-        ----------
-        prefecture_df: pandas.DataFrame
-            47都道府県の情報が格納されたデータフレーム
-
-        Returns
-        -------
-        pandas.DataFrame
-            47都道府県に加え、日本全国のその日毎の感染者数情報が格納されたデータフレーム"""
-        # 全国の感染者情報を保持したDataFrameを生成
-        nationwide_df = prefecture_df.groupby([cls.CSV_DATE_COL_NAME]).sum().reset_index(drop=False)
-        nationwide_df[cls.CSV_PREFECTURE_CODE_NAME] = cls.NATIONWIDE_PREFECTURE_CODE  # 便宜上のコード'00'
-        nationwide_df = nationwide_df.reindex(columns=cls.CSV_COLUMN_D_TYPES.keys())  # 列の順番を並び替え
-
-        # 都道府県毎の情報に、全国の情報を追加
-        ret = pd.concat([prefecture_df, nationwide_df]).reset_index(drop=True)
-
-        return ret
-
-    @classmethod
     def gen_df(cls):
         """公開されているファイルから、感染者数のDataFrameを作成.
 
@@ -96,4 +63,43 @@ class NHKPrefecturesCSV:
         # 都道府県毎の情報から、不必要な列情報を削除
         prefecture_df = prefecture_df[cls.CSV_COLUMN_D_TYPES.keys()]
 
-        return cls._add_nationwide(prefecture_df)
+        return prefecture_df
+
+
+class NHKNationwideCSV(CSVBase):
+    """MHKが配布している全国の感染者数CSV"""
+    # 全国の1日毎の感染者数(NHKまとめ)
+    # https://www3.nhk.or.jp/news/special/coronavirus/data/
+    URL = "https://www3.nhk.or.jp/n-data/opendata/coronavirus/nhk_news_covid19_domestic_daily_data.csv"
+
+    # CSVファイルの各列の情報
+    CSV_DATE_COL_NAME = "日付"
+    CSV_NUM_NAME = "国内の感染者数_1日ごとの発表数"
+
+    # 列とそのデータ型
+    CSV_COLUMN_D_TYPES = {
+        CSV_DATE_COL_NAME: str,
+        CSV_NUM_NAME: int
+    }
+
+    # 日本全国を指す都道府県コード(あくまで便宜上)
+    NATIONWIDE_PREFECTURE_CODE = "00"
+
+
+class NHKPrefecturesCSV(CSVBase):
+    """MHKが配布している都道府県ごとの感染者数CSV"""
+    # 都道府県ごとの感染者数（累計・NHKまとめ）
+    # https://www3.nhk.or.jp/news/special/coronavirus/data/
+    URL = "https://www3.nhk.or.jp/n-data/opendata/coronavirus/nhk_news_covid19_prefectures_daily_data.csv"
+
+    # CSVファイルの各列の情報
+    CSV_DATE_COL_NAME = "日付"
+    CSV_PREFECTURE_CODE_NAME = "都道府県コード"
+    CSV_NUM_NAME = "各地の感染者数_1日ごとの発表数"
+
+    # 列とそのデータ型
+    CSV_COLUMN_D_TYPES = {
+        CSV_DATE_COL_NAME: str,
+        CSV_PREFECTURE_CODE_NAME: str,
+        CSV_NUM_NAME: int
+    }
