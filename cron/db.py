@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy import Column, TIMESTAMP, DATE, CHAR, Integer
 
-from csv_file import NHKPrefecturesCSV
+from csv_file import NHKPrefecturesCSV, NHKNationwideCSV
 
 # 以下の条件を満たすため、利用ユーザ数が増えない限りDBはsqlite3で良いと思ってる
 #   - テーブル更新はcronでの定期実行のみ
@@ -27,6 +27,7 @@ class PatientsModel(Base):
     __tablename__ = "patient"
 
     # 都道府県コード(JISX0401)
+    # 全国の場合は、便宜上"00"を使用
     prefecture_code = Column(CHAR(2), primary_key=True)
     # 発症または感染が公表された年月日
     publication_date = Column(DATE, primary_key=True)
@@ -39,31 +40,50 @@ class PatientsModel(Base):
         return f"{self.__class__.__name__}({self.publication_date}, num:{self.num})"
 
     @classmethod
-    def gen_models(cls, df):
+    def gen_models(cls, prefectures_df, nationwide_df):
         """データフレームからモデルを作成.
 
         Parameters
         ----------
-        df: pandas.DataFrame
-            感染者情報のデータフレーム
+        prefectures_df: pandas.DataFrame
+            都道府県毎の感染者情報のデータフレーム
+        nationwide_df: pandas.DataFrame
+            全国の感染者情報のデータフレーム
 
         Returns
         -------
         list[PatientsModel]"""
         models = []
 
-        for idx in range(len(df)):
+        # 都道府県毎の情報を生成
+        for idx in range(len(prefectures_df)):
             # 情報を生成
-            publication_date = datetime.strptime(df.iloc[idx][NHKPrefecturesCSV.CSV_DATE_COL_NAME], "%Y/%m/%d")
-            num = int(df.iloc[idx][NHKPrefecturesCSV.CSV_NUM_NAME])
-            prefecture_code = df.iloc[idx][NHKPrefecturesCSV.CSV_PREFECTURE_CODE_NAME]
+            publication_date = datetime.strptime(
+                prefectures_df.iloc[idx][NHKPrefecturesCSV.CSV_DATE_COL_NAME], "%Y/%m/%d")
+            num = int(prefectures_df.iloc[idx][NHKPrefecturesCSV.CSV_NUM_NAME])
+            prefecture_code = prefectures_df.iloc[idx][NHKPrefecturesCSV.CSV_PREFECTURE_CODE_NAME]
             # 1レコード分の情報生成
-            table = PatientsModel()
-            table.publication_date = publication_date
-            table.num = num
-            table.prefecture_code = prefecture_code
+            model = PatientsModel()
+            model.publication_date = publication_date
+            model.num = num
+            model.prefecture_code = prefecture_code
 
-            models.append(table)
+            models.append(model)
+
+        # 全国の情報を生成
+        for idx in range(len(nationwide_df)):
+            # 情報を生成
+            publication_date = datetime.strptime(
+                nationwide_df.iloc[idx][NHKNationwideCSV.CSV_DATE_COL_NAME], "%Y/%m/%d")
+            num = int(nationwide_df.iloc[idx][NHKNationwideCSV.CSV_NUM_NAME])
+            # 1レコード分の情報生成
+            model = PatientsModel()
+            model.publication_date = publication_date
+            model.num = num
+            # 便宜上の都道府県コード
+            model.prefecture_code = NHKNationwideCSV.NATIONWIDE_PREFECTURE_CODE
+
+            models.append(model)
 
         return models
 

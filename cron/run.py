@@ -1,11 +1,12 @@
 if __name__ == '__main__':
-    from csv_file import NHKPrefecturesCSV
+    from csv_file import NHKPrefecturesCSV, NHKNationwideCSV
     from db import init_db, PatientsModel
 
     init_db()
     # NHKが配布しているCSVからDataFrameを生成
-    df = NHKPrefecturesCSV.gen_df()
+    prefectures_df = NHKPrefecturesCSV.gen_df()
+    nationwide_df = NHKNationwideCSV.gen_df()
     # DataFrameをDBテーブルモデルに変換
-    models = PatientsModel.gen_models(df)
+    models = PatientsModel.gen_models(prefectures_df, nationwide_df)
     # DBに情報をDELETE/INSERT
     PatientsModel.delete_insert(models)
