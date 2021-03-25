@@ -3,7 +3,7 @@
 
 ## 環境等
 - サーバ: ConoHa VPS (個人開発のため金銭上の都合)
-- サーバOS: Ubuntu16
+- サーバOS: Ubuntu20.04
 - 言語: Python3.8.5
 - WEBフレームワーク: Flask
 
