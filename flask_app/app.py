@@ -9,6 +9,11 @@ app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False
 app.config["JSON_SORT_KEYS"] = False
 
+# Flaskの元々の予約語 {{}} は Vue.jsの予約語と被るため、
+# Flaskの予約語を変更する
+app.jinja_options["variable_start_string"] = "[["
+app.jinja_options["variable_end_string"] = "]]"
+
 
 @app.route("/calendar/<prefecture_code>", methods=["GET"])
 def api_calendar(prefecture_code):

@@ -10,7 +10,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta property="og:title" content="コロナカレンダー" />
   <meta property="og:description" content="コロナ感染者数をカレンダー風に表示" />
-  <meta property="og:image" content="http://{{ domain }}/static/card_image.jpg" />
+  <meta property="og:image" content="http://[[ domain ]]/static/card_image.jpg" />
 
   <!-- Load required Bootstrap and BootstrapVue CSS -->
   <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
@@ -36,7 +36,7 @@
     <label class="my-1 mr-2" for="selectPrefecture">地域</label>
     <select class="custom-select my-1 mr-sm-3" id="selectPrefecture" @change="changePrefecture($event)">
       <option v-for="option in options" v-bind:value="option.prefecture_code" v-bind:key="option.prefecture_code">
-          [[ option.prefecture_name ]]
+          {{ option.prefecture_name }}
       </option>
     </select>
   </form>
@@ -58,15 +58,15 @@
     </thead>
     <tbody>
     <tr v-for="(item, index) in items">
-      <td>[[ item.header_date ]]</td>
-      <td>[[ item.num_list[0] ]]</td>
-      <td>[[ item.num_list[1] ]]</td>
-      <td>[[ item.num_list[2] ]]</td>
-      <td>[[ item.num_list[3] ]]</td>
-      <td>[[ item.num_list[4] ]]</td>
-      <td>[[ item.num_list[5] ]]</td>
-      <td>[[ item.num_list[6] ]]</td>
-      <td>[[ item.total ]]</td>
+      <td>{{ item.header_date }}</td>
+      <td>{{ item.num_list[0] }}</td>
+      <td>{{ item.num_list[1] }}</td>
+      <td>{{ item.num_list[2] }}</td>
+      <td>{{ item.num_list[3] }}</td>
+      <td>{{ item.num_list[4] }}</td>
+      <td>{{ item.num_list[5] }}</td>
+      <td>{{ item.num_list[6] }}</td>
+      <td>{{ item.total }}</td>
     </tr>
     </tbody>
   </table>
