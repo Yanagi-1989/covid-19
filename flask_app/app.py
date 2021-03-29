@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 
 from db import PatientsModel
 from util import gen_weekly_num_lists, gen_header_dates, gen_weekly_totals
@@ -105,12 +105,11 @@ def api_prefectures():
 
 @app.route("/")
 def index():
-    return render_template("index.html", domain=os.environ["DOMAIN"])
-
-
-@app.route("/pc")
-def pc_index():
-    return render_template("pc-index.html", domain=os.environ["DOMAIN"], twitter_user_name="yanagi_1989")
+    # https://werkzeug.palletsprojects.com/en/1.0.x/utils/#module-werkzeug.useragents
+    if request.user_agent.platform not in {"android", "iphone"}:
+        return render_template("pc-index.html", domain=os.environ["DOMAIN"], twitter_user_name="yanagi_1989")
+    else:
+        return render_template("index.html", domain=os.environ["DOMAIN"])
 
 
 if __name__ == "__main__":
