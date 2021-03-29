@@ -107,7 +107,9 @@ def api_prefectures():
 def index():
     # https://werkzeug.palletsprojects.com/en/1.0.x/utils/#module-werkzeug.useragents
     if request.user_agent.platform not in {"android", "iphone"}:
-        return render_template("pc-index.html", domain=os.environ["DOMAIN"], twitter_user_name="yanagi_1989")
+        return render_template("pc-index.html",
+                               domain=os.environ["DOMAIN"],
+                               twitter_user_name=os.environ["TWITTER_USER_NAME"])
     else:
         return render_template("index.html", domain=os.environ["DOMAIN"])
 
