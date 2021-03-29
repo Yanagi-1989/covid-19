@@ -108,5 +108,10 @@ def index():
     return render_template("index.html", domain=os.environ["DOMAIN"])
 
 
+@app.route("/pc")
+def pc_index():
+    return render_template("pc-index.html", domain=os.environ["DOMAIN"])
+
+
 if __name__ == "__main__":
     app.run()
