@@ -51,6 +51,20 @@
             </a>
           </li>
         </ul>
+
+        <!-- INFO -->
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>INFO</span>
+        </h6>
+        <ul class="nav flex-column mb-2">
+          <li class="nav-item">
+            <a class="nav-link" v-bind:class="{ active: isAboutActive }" href="#" v-on:click="showAbout()">
+              <span data-feather="box"></span>
+              このサイトについて
+            </a>
+          </li>
+        </ul>
+
       </div>
     </nav>
 
@@ -101,6 +115,55 @@
             </tbody>
           </table>
         </div>
+
+      </div>
+      <div v-show="isAboutActive">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <h1 class="h2">このサイトについて</h1>
+        </div>
+        <div>
+          公開されているコロナの感染者数を集計し、カレンダー風に表示します。<br/>
+          <br/>
+          <br/>
+
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">このサイトで使用しているデータ</h1>
+          </div>
+          <div>
+            <a href="https://www3.nhk.or.jp/news/special/coronavirus/data/" target="_blank">
+              NHKの特設サイト
+            </a>
+            にて配布されているファイルを使用しています。
+            <br/>
+            <br/>
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link"
+                   href="https://www3.nhk.or.jp/n-data/opendata/coronavirus/nhk_news_covid19_prefectures_daily_data.csv"
+                   target="_blank">
+                  <span data-feather="file-text"></span>
+                  都道府県毎の感染者数(https://www3.nhk.or.jp/n-data/opendata/coronavirus/nhk_news_covid19_prefectures_daily_data.csv)
+                </a>
+                <a class="nav-link"
+                   href="https://www3.nhk.or.jp/n-data/opendata/coronavirus/nhk_news_covid19_domestic_daily_data.csv"
+                   target="_blank">
+                  <span data-feather="file-text"></span>
+                  全国の感染者数(https://www3.nhk.or.jp/n-data/opendata/coronavirus/nhk_news_covid19_domestic_daily_data.csv)
+                </a>
+              </li>
+            </ul>
+            <br/>
+            <br/>
+
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+              <h1 class="h2">作者のSNS</h1>
+            </div>
+            <a href="https://twitter.com/yanagi_1989" target="_blank">
+              <span data-feather="twitter"></span>
+              @yanagi_1989
+            </a>
+
+          </div>
       </div>
     </main>
 
