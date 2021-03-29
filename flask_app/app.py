@@ -110,7 +110,7 @@ def index():
 
 @app.route("/pc")
 def pc_index():
-    return render_template("pc-index.html", domain=os.environ["DOMAIN"])
+    return render_template("pc-index.html", domain=os.environ["DOMAIN"], twitter_user_name="yanagi_1989")
 
 
 if __name__ == "__main__":
