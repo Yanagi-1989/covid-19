@@ -111,7 +111,7 @@ def index():
                                domain=os.environ["DOMAIN"],
                                twitter_user_name=os.environ["TWITTER_USER_NAME"])
     else:
-        return render_template("index.html", domain=os.environ["DOMAIN"])
+        pass
 
 
 if __name__ == "__main__":
