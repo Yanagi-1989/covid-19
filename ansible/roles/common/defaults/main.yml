@@ -28,3 +28,6 @@ flask_app_uwsgi_ini_path: "{{ flask_app_directory }}/uwsgi.ini"
 
 # ウェブアプリを公開するIPアドレスもしくはドメイン(Twitterカードにて使用する"og:image"は絶対パスのみ使用できるため)
 flask_app_domain: "takowasa-covid19.click"
+
+# サイトの説明に用いる、作者のツイッターアカウント https://twitter.com/XXXXXX 部分
+twitter_user_name: "yanagi_1989"

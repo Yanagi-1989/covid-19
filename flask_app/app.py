@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 
 from db import PatientsModel
 from util import gen_weekly_num_lists, gen_header_dates, gen_weekly_totals
@@ -8,6 +8,11 @@ from util import gen_weekly_num_lists, gen_header_dates, gen_weekly_totals
 app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False
 app.config["JSON_SORT_KEYS"] = False
+
+# Flaskの元々の予約語 {{}} は Vue.jsの予約語と被るため、
+# Flaskの予約語を変更する
+app.jinja_options["variable_start_string"] = "[["
+app.jinja_options["variable_end_string"] = "]]"
 
 
 @app.route("/calendar/<prefecture_code>", methods=["GET"])
@@ -100,7 +105,9 @@ def api_prefectures():
 
 @app.route("/")
 def index():
-    return render_template("index.html", domain=os.environ["DOMAIN"])
+    return render_template("pc-index.html",
+                           domain=os.environ["DOMAIN"],
+                           twitter_user_name=os.environ["TWITTER_USER_NAME"])
 
 
 if __name__ == "__main__":

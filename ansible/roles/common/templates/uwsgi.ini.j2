@@ -12,5 +12,7 @@ chdir = {{ flask_app_directory }}
 env = DB_PATH={{ db_file_path }}
 # ウェブアプリを公開するIPアドレスもしくはドメイン(Twitterカードにて使用する"og:image"は絶対パスのみ使用できため)
 env = DOMAIN={{ flask_app_domain }}
+# サイトの説明に用いる、作者のツイッターアカウント
+env = TWITTER_USER_NAME={{ twitter_user_name }}
 # ログ出力先
 logto = {{ uwsgi_log_file_path }}
