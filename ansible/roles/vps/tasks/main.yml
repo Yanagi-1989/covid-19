@@ -1,6 +1,11 @@
-# conoha vpsではたまapt upgradeができないことがある。EC2では起こらないぽい
-- name: 「/usr/bin/aptitude safe-upgrade' failed」を発生させないようにする
-  shell: rm /var/lib/dpkg/lock-frontend
+- name: apt update upgrade
+  apt:
+    update_cache: yes
+    upgrade: yes
+
+- name: 再起動
+  reboot:
+    reboot_timeout: 120
 
 - name: ユーザ追加
   user:

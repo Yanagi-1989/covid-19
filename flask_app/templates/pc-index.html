@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <!-- Twitterカード -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta property="og:title" content="コロナカレンダー"/>
+  <meta property="og:description" content="コロナ感染者数をカレンダー風に表示"/>
+  <meta property="og:image" content="http://[[ domain ]]/static/card_image.jpg"/>
+
+  <!-- Load required Bootstrap and BootstrapVue CSS -->
+  <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css"/>
+
+  <!-- Load polyfills to support older browsers -->
+  <script src="//polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver"
+          crossorigin="anonymous"></script>
+  <!-- Load Vue followed by BootstrapVue -->
+  <script src="//unpkg.com/vue@latest/dist/vue.min.js"></script>
+  <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+  <!-- axios -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+  <!-- feather-icons https://github.com/feathericons/feather -->
+  <script src="https://unpkg.com/feather-icons"></script>
+  <!-- フォント -->
+  <link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300&family=Roboto:wght@100&display=swap"
+        rel="stylesheet">
+  <!-- 独自定義 -->
+  <link rel="stylesheet" type="text/css" href="../static/api.css"/>
+  <link rel="stylesheet" href="../static/pc.css">
+
+  <title>コロナカレンダー PC</title>
+</head>
+
+<body>
+
+<div class="container-fluid">
+  <div class="row" id="left-navi">
+    <!-- 画面左のメニューバー -->
+    <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+      <div class="sidebar-sticky">
+        <!-- コロナ感染者情報 -->
+        <h3 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>コロナ感染者情報</span>
+        </h3>
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" v-bind:class="{ active: isCalenderActive }" href="#" v-on:click="showCalender()">
+              <span data-feather="calendar"></span>
+              コロナ感染者カレンダー
+            </a>
+          </li>
+        </ul>
+
+        <!-- INFO -->
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>INFO</span>
+        </h6>
+        <ul class="nav flex-column mb-2">
+          <li class="nav-item">
+            <a class="nav-link" v-bind:class="{ active: isAboutActive }" href="#" v-on:click="showAbout()">
+              <span data-feather="box"></span>
+              このサイトについて
+            </a>
+          </li>
+        </ul>
+
+      </div>
+    </nav>
+
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 main">
+      <div v-show="isCalenderActive">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <h1 class="h2">コロナ感染者カレンダー</h1>
+        </div>
+
+        <div id="calendar" class="table-responsive-sm" v-pre>
+          <form class="form-inline my-2 mx-2">
+            <label class="my-1 mr-2" for="selectPrefecture">地域を選択</label>
+            <select class="custom-select my-1 mr-sm-3" id="selectPrefecture" v-on:change="changePrefecture($event)">
+              <option v-for="option in options" v-bind:value="option.prefecture_code"
+                      v-bind:key="option.prefecture_code">
+                {{ option.prefecture_name }}
+              </option>
+            </select>
+          </form>
+
+          <!-- スマホの横幅的に、マージンを設けると逆に見にくくなるのでそのまま表示 -->
+          <table class="table table-striped table-bordered table-sm">
+            <thead>
+            <tr>
+              <th class="week">週</th>
+              <th class="num">月</th>
+              <th class="num">火</th>
+              <th class="num">水</th>
+              <th class="num">木</th>
+              <th class="num">金</th>
+              <th class="num">土</th>
+              <th class="num">日</th>
+              <th class="total">合計</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(item, index) in items">
+              <td>{{ item.header_date }}</td>
+              <td>{{ item.num_list[0] }}</td>
+              <td>{{ item.num_list[1] }}</td>
+              <td>{{ item.num_list[2] }}</td>
+              <td>{{ item.num_list[3] }}</td>
+              <td>{{ item.num_list[4] }}</td>
+              <td>{{ item.num_list[5] }}</td>
+              <td>{{ item.num_list[6] }}</td>
+              <td>{{ item.total }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+      <div v-show="isAboutActive">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <h1 class="h2">このサイトについて</h1>
+        </div>
+        <div>
+          公開されているコロナの感染者数を集計し、カレンダー風に表示します。<br/>
+          <br/>
+          <br/>
+
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">このサイトで使用しているデータ</h1>
+          </div>
+          <div>
+            <a href="https://www3.nhk.or.jp/news/special/coronavirus/data/" target="_blank">
+              NHKの特設サイト
+            </a>
+            にて配布されているファイルを使用しています。
+            <br/>
+            <br/>
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link"
+                   href="https://www3.nhk.or.jp/n-data/opendata/coronavirus/nhk_news_covid19_prefectures_daily_data.csv"
+                   target="_blank">
+                  <span data-feather="file-text"></span>
+                  都道府県毎の感染者数(https://www3.nhk.or.jp/n-data/opendata/coronavirus/nhk_news_covid19_prefectures_daily_data.csv)
+                </a>
+                <a class="nav-link"
+                   href="https://www3.nhk.or.jp/n-data/opendata/coronavirus/nhk_news_covid19_domestic_daily_data.csv"
+                   target="_blank">
+                  <span data-feather="file-text"></span>
+                  全国の感染者数(https://www3.nhk.or.jp/n-data/opendata/coronavirus/nhk_news_covid19_domestic_daily_data.csv)
+                </a>
+              </li>
+            </ul>
+            <br/>
+            <br/>
+
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+              <h1 class="h2">作者のSNS</h1>
+            </div>
+            <a href="https://twitter.com/[[ twitter_user_name ]]" target="_blank">
+              <span data-feather="twitter"></span>
+              @[[ twitter_user_name ]]
+            </a>
+
+          </div>
+      </div>
+    </main>
+
+  </div>
+</div>
+
+<!-- feather-icons https://github.com/feathericons/feather を有効化 -->
+<script>feather.replace()</script>
+<script type="text/javascript" src="../static/page-switching.js"></script>
+<script type="text/javascript" src="../static/api.js"></script>
+</body>
+</html>
